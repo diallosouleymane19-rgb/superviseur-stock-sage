@@ -15,6 +15,7 @@ from utils.calcul_approvisionnement import (
     consolider_besoins_supermarchés
 )
 from auth import login, logout, is_connecte, get_role
+from utils.email_sender import envoyer_commande_email
 
 # ---------------------------------------------------------
 # AUTHENTIFICATION
