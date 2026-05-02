@@ -16,7 +16,7 @@ from utils.calcul_approvisionnement import (
 )
 from auth import login, logout, is_connecte, get_role
 from utils.email_sender import envoyer_commande_email
-
+from utils.email_sender import envoyer_commande_email
 # ---------------------------------------------------------
 # AUTHENTIFICATION
 # ---------------------------------------------------------
