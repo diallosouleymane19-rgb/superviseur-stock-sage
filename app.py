@@ -2,10 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import base64
+from datetime import datetime
 from utils.sage_connector import (
     get_stock_temps_reel,
     get_commandes_demo,
     get_mouvements_demo
+)
 )
 from utils.export_commande import export_commande_excel
 from utils.calcul_approvisionnement import (
