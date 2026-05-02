@@ -7,8 +7,9 @@ from utils.sage_connector import (
     get_commandes_demo,
     get_mouvements_demo
 )
-from utils.export_commande import export_commande_excel 
-analyser_alertes_stock,
+from utils.export_commande import export_commande_excel
+from utils.calcul_approvisionnement import (
+    analyser_alertes_stock,
     generer_commande_portugal,
     consolider_besoins_supermarchés
 )
