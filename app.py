@@ -7,7 +7,7 @@ from utils.sage_connector import (
     get_commandes_demo,
     get_mouvements_demo
 )
-from utils.calcul_approvisionnement import (
+from utils.export_commande import export_commande_excel (
     analyser_alertes_stock,
     generer_commande_portugal,
     consolider_besoins_supermarchés
@@ -286,13 +286,17 @@ elif page == "✈️ Commande Portugal":
         st.subheader("📋 Liste des produits à commander")
         st.dataframe(df_commande_portugal, use_container_width=True)
 
-        # Export
-        csv = df_commande_portugal.to_csv(index=False).encode("utf-8")
+        buffer = export_commande_excel(
+            df_commande_portugal,
+            nom_societe="Entrepôt Central — Guinée-Bissau",
+            pays_fournisseur="Portugal"
+        )
         st.download_button(
-            label="📥 Télécharger la liste de commande",
-            data=csv,
-            file_name="commande_portugal.csv",
-            mime="text/csv"
+            label="📥 Télécharger la commande en Excel",
+            data=buffer,
+            file_name=f"Commande_Portugal_{datetime.now().strftime('%Y%m%d')}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+       
         )
 
 # ---------------------------------------------------------
