@@ -293,8 +293,14 @@ elif page == "✈️ Commande Portugal":
             nom_societe="Entrepôt Central — Guinée-Bissau",
             pays_fournisseur="Portugal"
         )
-        st.download_button(
-# Envoi par email
+       st.download_button(
+            label="📥 Télécharger la commande en Excel",
+            data=buffer,
+            file_name=f"Commande_Portugal_{datetime.now().strftime('%Y%m%d')}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        # Envoi par email
         st.markdown("---")
         st.subheader("📧 Envoyer par email au fournisseur")
         email_dest = st.text_input(
@@ -315,12 +321,6 @@ elif page == "✈️ Commande Portugal":
                     st.error(message)
             else:
                 st.warning("⚠️ Veuillez saisir l'email du fournisseur.")
-            label="📥 Télécharger la commande en Excel",
-            data=buffer,
-            file_name=f"Commande_Portugal_{datetime.now().strftime('%Y%m%d')}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-       
-        )
 
 # ---------------------------------------------------------
 # PAGE : MES COMMANDES (Gérant Supermarché)
