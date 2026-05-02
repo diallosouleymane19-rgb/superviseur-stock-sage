@@ -294,6 +294,27 @@ elif page == "✈️ Commande Portugal":
             pays_fournisseur="Portugal"
         )
         st.download_button(
+# Envoi par email
+        st.markdown("---")
+        st.subheader("📧 Envoyer par email au fournisseur")
+        email_dest = st.text_input(
+            "Email du fournisseur Portugal",
+            placeholder="fournisseur@portugal.com"
+        )
+        if st.button("📧 Envoyer la commande par email"):
+            if email_dest:
+                with st.spinner("Envoi en cours..."):
+                    succes, message = envoyer_commande_email(
+                        df_commande_portugal,
+                        email_dest,
+                        "Fournisseur Portugal"
+                    )
+                if succes:
+                    st.success(message)
+                else:
+                    st.error(message)
+            else:
+                st.warning("⚠️ Veuillez saisir l'email du fournisseur.")
             label="📥 Télécharger la commande en Excel",
             data=buffer,
             file_name=f"Commande_Portugal_{datetime.now().strftime('%Y%m%d')}.xlsx",
