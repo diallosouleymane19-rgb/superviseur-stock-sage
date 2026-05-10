@@ -5,8 +5,9 @@ import base64
 from datetime import datetime
 from utils.sage_connector import (
     get_stock_temps_reel,
-    get_commandes_demo,
-    get_mouvements_demo
+    get_commandes_supermarchés,
+    get_mouvements_stock,
+    get_connection
 )
 from utils.export_commande import export_commande_excel
 from utils.calcul_approvisionnement import (
@@ -16,7 +17,7 @@ from utils.calcul_approvisionnement import (
 )
 from auth import login, logout, is_connecte, get_role
 from utils.email_sender import envoyer_commande_email
-from utils.email_sender import envoyer_commande_email
+
 # ---------------------------------------------------------
 # AUTHENTIFICATION
 # ---------------------------------------------------------
@@ -77,10 +78,15 @@ else:  # Gérant Supermarché
 
 page = st.sidebar.radio("Navigation", pages)
 
-# Indicateur connexion Sage
+# Indicateur connexion Sage dynamique
 st.sidebar.markdown("---")
 st.sidebar.markdown("**🔌 Connexion Sage :**")
-st.sidebar.warning("⚠️ Mode démonstration\n(Sage non connecté)")
+conn_test = get_connection()
+if conn_test:
+    st.sidebar.success("✅ SAGE 100 connecté")
+    conn_test.close()
+else:
+    st.sidebar.warning("⚠️ Mode démonstration\n(Sage non connecté)")
 
 # ---------------------------------------------------------
 # CHARGEMENT DES DONNÉES
@@ -88,8 +94,8 @@ st.sidebar.warning("⚠️ Mode démonstration\n(Sage non connecté)")
 @st.cache_data(ttl=300)  # Cache 5 minutes
 def charger_donnees():
     df_stock = get_stock_temps_reel()
-    df_commandes = get_commandes_demo()
-    df_mouvements = get_mouvements_demo()
+    df_commandes = get_commandes_supermarchés()
+    df_mouvements = get_mouvements_stock()
     return df_stock, df_commandes, df_mouvements
 
 df_stock, df_commandes, df_mouvements = charger_donnees()
@@ -321,73 +327,6 @@ elif page == "✈️ Commande Portugal":
                     st.error(message)
             else:
                 st.warning("⚠️ Veuillez saisir l'email du fournisseur.")
-# ---------------------------------------------------------
-# PAGE : MES COMMANDES (Gérant Supermarché)
-# ---------------------------------------------------------
-elif page == "🛒 Mes Commandes":
-    st.title(f"🛒 Mes Commandes — {nom}")
-    st.markdown("---")
-
-    # Filtrer les commandes du supermarché connecté
-    code_sm = st.session_state["username"].upper()
-    mes_commandes = df_commandes[df_commandes["code_client"] == code_sm]
-
-    if mes_commandes.empty:
-        st.info("Aucune commande trouvée pour votre supermarché.")
-    else:
-        col1, col2 = st.columns(2)
-        col1.metric("Mes commandes", len(mes_commandes))
-        col2.metric("Montant total", f"{mes_commandes['montant_ht'].sum():,.0f} XOF")
-        st.dataframe(mes_commandes, use_container_width=True)
 
 # ---------------------------------------------------------
-# PAGE : STOCK DISPONIBLE (Gérant Supermarché)
-# ---------------------------------------------------------
-elif page == "📦 Stock Disponible":
-    st.title("📦 Stock Disponible à l'Entrepôt")
-    st.markdown("---")
-
-    st.dataframe(df_stock[[
-        "reference", "designation", "famille",
-        "quantite_stock", "prix_vente"
-    ]], use_container_width=True)
-
-# ---------------------------------------------------------
-# PAGE : RAPPORTS & ANALYTICS (Directeur)
-# ---------------------------------------------------------
-elif page == "📊 Rapports & Analytics":
-    st.title("📊 Rapports & Analytics")
-    st.markdown("---")
-
-    onglet1, onglet2, onglet3 = st.tabs([
-        "📈 Évolution Stock",
-        "🏪 Performance Supermarchés",
-        "💰 Valeur Stock"
-    ])
-
-    with onglet1:
-        st.subheader("📈 Top 10 produits par valeur de stock")
-        df_top = df_stock.nlargest(10, "valeur_stock")
-        fig = px.bar(df_top, x="designation", y="valeur_stock",
-                     color="famille",
-                     title="Top 10 produits par valeur de stock")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with onglet2:
-        st.subheader("🏪 Commandes par supermarché")
-        df_sm = df_commandes.groupby("nom_supermarche").agg(
-            total_commandes=("numero_commande", "count"),
-            montant_total=("montant_ht", "sum")
-        ).reset_index()
-        fig = px.bar(df_sm, x="nom_supermarche", y="montant_total",
-                     color="total_commandes",
-                     title="Montant des commandes par supermarché")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with onglet3:
-        st.subheader("💰 Valeur du stock par famille")
-        df_val = df_stock.groupby("famille")["valeur_stock"].sum().reset_index()
-        fig = px.pie(df_val, values="valeur_stock", names="famille",
-                     title="Répartition de la valeur du stock")
-        st.plotly_chart(fig, use_container_width=True)
-    
+# P
